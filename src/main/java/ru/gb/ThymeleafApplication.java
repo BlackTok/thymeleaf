@@ -14,5 +14,10 @@ public class ThymeleafApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ThymeleafApplication.class, args);
 
+		SessionFactoryUnits sessionFactoryUnits = new SessionFactoryUnits();
+
+		ProductDao productDao = new ProductDao(sessionFactoryUnits);
+		ProductService productService = new ProductService(productDao);
+		ProductController productController = new ProductController(productService);
 	}
 }

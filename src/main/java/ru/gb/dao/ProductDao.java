@@ -30,21 +30,18 @@ public class ProductDao implements IProductDao {
     }
 
     @Override
-    public void addProduct(String title, int cost) {
+    public void addProduct(Product product) {
         try (Session session = sessionFactoryUnits.getCurrentSession()) {
             session.beginTransaction();
-            Product product = new Product(title, cost);
             session.saveOrUpdate(product);
             session.getTransaction().commit();
         }
     }
 
     @Override
-    public void changeCost(Long id, int delta) {
+    public void updateProduct(Product product) {
         try (Session session = sessionFactoryUnits.getCurrentSession()) {
             session.beginTransaction();
-            Product product = session.get(Product.class, id);
-            product.setCost(product.getCost() + delta);
             session.saveOrUpdate(product);
             session.getTransaction().commit();
         }

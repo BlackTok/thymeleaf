@@ -10,9 +10,10 @@ public class Product {
     public Product() {
     }
 
-    public Product(String title, int cost) {
+    public Product(String title, int cost, double purchasePrice) {
         this.title = title;
         this.cost = cost;
+        this.purchasePrice = purchasePrice;
     }
 
     @Id
@@ -25,4 +26,7 @@ public class Product {
 
     @Column(name = "cost")
     private int cost;
+
+    @Column(name = "purchase_price")
+    private double purchasePrice;
 }

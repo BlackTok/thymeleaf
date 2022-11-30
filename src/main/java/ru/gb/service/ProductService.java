@@ -32,12 +32,13 @@ public class ProductService {
         return productsForPage;
     }
 
-    public void addProduct(String title, int cost) {
-        productDao.addProduct(title, cost);
+    public void addProduct(Product product) {
+        productDao.addProduct(product);
     }
 
-    public void changeCost(Long id, int delta) {
-        productDao.changeCost(id, delta);
+    public void changeCost(Product product, int delta) {
+        product.setCost(product.getCost() + delta);
+        productDao.updateProduct(product);
     }
 
     public void deleteProduct(Long id) {

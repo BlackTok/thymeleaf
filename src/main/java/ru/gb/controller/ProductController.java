@@ -1,9 +1,8 @@
 package ru.gb.controller;
 
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.gb.dto.ProductDto;
 import ru.gb.entity.Product;
 import ru.gb.service.ProductService;
 
@@ -22,22 +21,24 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public List<Product> getProductsForPage(@RequestParam int pageNumber) {
-        return productService.getPageOfProducts(pageNumber, 3);
+    public List<ProductDto> getProductsForPage(@RequestParam int pageNumber) {
+        return productService.getPageOfProducts(pageNumber, 3).
+                stream().map(p -> new ProductDto(p)).toList();
     }
 
-    @GetMapping("/products/add")
-    public void addProduct(@RequestParam String title, @RequestParam int cost) {
-        productService.addProduct(title, cost);
+    @PostMapping("/products")
+    public void addProduct(@RequestBody Product product) {
+        product.setPurchasePrice(product.getCost() * 0.8);
+        productService.addProduct(product);
     }
 
-    @GetMapping("/products/change")
-    public void changeCost(@RequestParam Long id, @RequestParam int delta) {
-        productService.changeCost(id, delta);
+    @PutMapping("/products/{id}")
+    public void changeCost(@PathVariable int costDelta, @RequestBody Product product) {
+        productService.changeCost(product, costDelta);
     }
 
-    @GetMapping("/products/delete")
-    public void deleteProduct(@RequestParam Long id) {
+    @DeleteMapping("/products/{id}")
+    public void deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
     }
 }

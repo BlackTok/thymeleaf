@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html ng-app="app">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.min.js"></script>
+    <script src="index.js"></script>
+</head>
+
+<body>
+
+<div class="container" ng-controller="indexController">
+    <h3>Список продуктов</h3>
+    <table class="table table-hover" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>ID</td>
+            <td>Наименование</td>
+            <td>Цена</td>
+            <td>Управление</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <input type="text" class="form-control" placeholder="Яблоко" aria-describedby="basic-addon2" ng-model="title">
+            </td>
+            <td>
+                <input type="text" class="form-control" placeholder="100" aria-describedby="basic-addon3" ng-model="cost">
+            </td>
+            <td>
+                <button class="btn btn-success" ng-click="addProduct(title, cost)">Добавить</button>
+            </td>
+        </tr>
+        <tbody>
+        <tr ng-repeat="p in ProductsList">
+            <td>{{p.id}}</td>
+            <td>{{p.title}}</td>
+            <td>
+                <button class="btn btn-primary" ng-click="changeCost(p.id, -10)">-</button>
+                {{p.cost}}
+                <button class="btn btn-primary" ng-click="changeCost(p.id, 10)">+</button>
+            </td>
+            <td><button class="btn btn-danger" ng-click="deleteProduct(p.id)">Удалить</button></td>
+        </tr>
+        </tbody>
+        <tr>
+            <td>
+                <button class="btn btn-primary" ng-click="changePage(-1)">Предыдущая</button>
+            </td>
+            <td>
+                <button class="btn btn-primary" ng-click="changePage(1)">Следующая</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+</body>
+
+</html>

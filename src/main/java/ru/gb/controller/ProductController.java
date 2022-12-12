@@ -2,28 +2,32 @@ package ru.gb.controller;
 
 
 import org.springframework.web.bind.annotation.*;
+import ru.gb.converter.ProductConverter;
 import ru.gb.dto.ProductDto;
 import ru.gb.entity.Product;
 import ru.gb.service.ProductService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class ProductController {
     private final ProductService productService;
+    ProductConverter productConverter = new ProductConverter();
 
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
-    private void initFactory() {
-
-    }
-
     @GetMapping("/products")
-    public List<ProductDto> getProductsForPage(@RequestParam int pageNumber) {
-        return productService.getPageOfProducts(pageNumber, 3).
-                stream().map(p -> new ProductDto(p)).toList();
+    public List<ProductDto> getProductsForPage() {
+        List<Product> products = productService.getPageOfProducts();
+        List<ProductDto> productDtos = new ArrayList<>();
+        for (Product p : products) {
+            productDtos.add(productConverter.entityToDto(p));
+        }
+
+        return productDtos;
     }
 
     @PostMapping("/products")

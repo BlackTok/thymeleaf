@@ -3,7 +3,9 @@ package ru.gb.service;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import ru.gb.converter.ProductConverter;
 import ru.gb.dao.ProductDao;
+import ru.gb.dto.ProductDto;
 import ru.gb.entity.Product;
 
 import java.util.ArrayList;
@@ -12,24 +14,15 @@ import java.util.List;
 @Service
 public class ProductService {
     private ProductDao productDao;
+    private ProductConverter productConverter;
 
-    public ProductService(ProductDao productDao) {
+    public ProductService(ProductDao productDao, ProductConverter productConverter) {
         this.productDao = productDao;
+        this.productConverter = productConverter;
     }
 
-    public List<Product> getPageOfProducts(int numberPage, int countOnPage) {
-        List<Product> allProducts = productDao.getAllProduct();
-        List<Product> productsForPage = new ArrayList<>();
-        int lastProduct = numberPage * countOnPage;
-        int firstProduct = numberPage * countOnPage - countOnPage;
-        if (lastProduct > allProducts.size())
-            lastProduct = allProducts.size();
-
-        for (int i = firstProduct; i < lastProduct; i++) {
-            productsForPage.add(allProducts.get(i));
-        }
-
-        return productsForPage;
+    public List<Product> getPageOfProducts() {
+        return productDao.getAllProduct();
     }
 
     public void addProduct(Product product) {

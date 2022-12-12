@@ -1,68 +1,126 @@
-angular.module('app', []).controller('indexController', function ($scope, $http) {
-    const contextPath = 'http://localhost:8081';
+const url = "http://localhost:8081";
+const $site = document.querySelector('#site')
+let table = null;
 
-    $scope.pageNumber = 1;
+function createTable(titleRow) {
+    if (table != null) {
+        table.innerHTML = "";
+        table.remove();
+    }
+    table = document.createElement("table");
+    document.getElementById("table").appendChild(table);
+    table.setAttribute("class", "table table-hover");
+    addDataToTable(titleRow, "");
+}
 
-    $scope.productsPage = function (pageNumber) {
-            $http({
-                url: contextPath + "/products",
-                method: "GET",
-                params: {
-                    pageNumber: pageNumber
-                }
-            }).then(function (response) {
-                $scope.ProductsList = response.data;
+function addDataToTable(product, button) {
+    row = table.insertRow();
+    for (let key in product) {
+        cell = row.insertCell();
+        cell.innerHTML = product[key];
+    }
+
+    if (button != "") {
+        cell = row.insertCell();
+        cell.innerHTML = button;
+    }
+}
+
+function getProducts() {
+    createTable({"id": "ID", "title": "Title", "price": "Price", "action": "Action"});
+
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+        if (this.status === 200 && this.readyState === 4) {
+            JSON.parse(xmlHttp.responseText).forEach(data => {
+                addDataToTable(data, getButton("addToCart", [data], "To cart"));
             });
+
+            document.getElementById("title").innerHTML = "Products Page";
+
+            var button = document.getElementById("mainButton");
+            button.innerHTML = "Cart";
+            button.setAttribute('onclick','getCart()')
+        };
+    };
+    xmlHttp.open("GET", url + "/products", false);
+    xmlHttp.send(null);
+}
+
+function getCart() {
+    createTable({"id": "ID", "title": "Title", "price": "Price", "count": "Count", "totalPrice": "Total price", "action": "Action"});
+
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+        if (this.status === 200 && this.readyState === 4) {
+        console.log(xmlHttp.responseText);
+            JSON.parse(xmlHttp.responseText).forEach(data => {
+                addDataToTable(data, getButton("deleteFromCartById", [data["id"]], "Delete"));
+            });
+
+            document.getElementById("title").innerHTML = "Cart";
+
+            var button = document.getElementById("mainButton");
+            button.innerHTML = "Products page";
+            button.setAttribute("onclick", "getProducts()");
+        };
+    };
+    xmlHttp.open("GET", url + "/cart", false);
+    xmlHttp.send(null);
+}
+
+function addToCart(product) {
+    console.log(product);
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("POST", url + '/cart', true);
+    xmlHttp.setRequestHeader("Content-Type", "application/json");
+
+    xmlHttp.onreadystatechange = () => {
+        if (xmlHttp.readyState === XMLHttpRequest.DONE && xmlHttp.status === 200) {
+            alert(xmlHttp.responseText);
         }
-
-    $scope.deleteProduct = function (id) {
-        $http({
-            url: contextPath + "/products/delete",
-            method: "GET",
-            params: {
-                id: id
-            }
-        }).then(function (response) {
-            $scope.productsPage($scope.pageNumber);
-        });
     }
+    xmlHttp.send(JSON.stringify(product));
+}
 
-    $scope.changeCost = function (id, delta) {
-        $http({
-            url: contextPath + "/products/change",
-            method: "GET",
-            params: {
-                id: id,
-                delta: delta
+function deleteFromCartById(id) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+            if (this.status === 200 && this.readyState === 4) {
+                getCart();
+            } else {
+                alert(xmlHttp.responseText)
             }
-        }).then(function (response) {
-            $scope.productsPage($scope.pageNumber);
-        });
-    }
+        };
+    xmlHttp.open("DELETE", url + "/cart/" + id, false);
+    xmlHttp.send(null);
+}
 
-    $scope.addProduct = function (title, cost) {
-        $http({
-            url: contextPath + "/products/add",
-            method: "GET",
-            params: {
-                title: title,
-                cost: cost
-            }
-        }).then(function (response) {
-            $scope.productsPage($scope.pageNumber);
-        });
-    }
+function reload(elementName){
+    var container = document.getElementById(elementName);
+    var content = container.innerHTML;
+    container.innerHTML = content;
 
-    $scope.changePage = function (deltaPage) {
-            if (deltaPage > 0)
-                $scope.pageNumber = $scope.pageNumber + deltaPage;
-            else if ($scope.pageNumber > 1)
-                $scope.pageNumber = $scope.pageNumber + deltaPage;
+    console.log("Refreshed");
+}
 
-            $scope.productsPage($scope.pageNumber);
-        }
+function getButton(func, params, text) {
+    var button = "<button class='btn btn-success' onclick='" + func + "(";
+    var lastIndex = params.length - 1;
+    var index = 0;
+    params.forEach(param => {
+        button = button + JSON.stringify(param);
+        if (lastIndex != index) {
+            button = button + ", ";
+        };
+        index++;
+    });
 
-    $scope.productsPage($scope.pageNumber);
+    button = button + ")'>" + text + "</button>";
 
-    console.log("111");
-});
+    console.log(button);
+
+    return button;
+}
+
+getProducts()

@@ -55,4 +55,15 @@ public class ProductDao implements IProductDao {
             session.getTransaction().commit();
         }
     }
+
+    @Override
+    public Product getProductById(Long id) {
+        try (Session session = sessionFactoryUnits.getCurrentSession()) {
+            session.beginTransaction();
+            Product product = session.get(Product.class, id);
+            session.close();
+
+            return product;
+        }
+    }
 }
